@@ -548,7 +548,7 @@ WARNING
         bundle_bin     = "bundle config set --global ssl_verify_mode 0 && "
         bundle_bin     << "bundle config set path 'vendor/bundle' && "
         bundle_bin     << "bundle config set without #{bundle_without} && bundle"
-        bundle_command = "#{bundle_bin} install -j4 && bundle binstubs --all"
+        bundle_command = "#{bundle_bin} install -j4"
 
         if File.exist?("#{Dir.pwd}/.bundle/config")
           warn(<<-WARNING, inline: true)
