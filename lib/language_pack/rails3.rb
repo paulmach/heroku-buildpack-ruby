@@ -59,7 +59,7 @@ private
   def run_assets_precompile_rake_task
     instrument "rails3.run_assets_precompile_rake_task" do
       log("assets_precompile") do
-        if File.exists?("public/assets/manifest.yml")
+        if File.exist?("public/assets/manifest.yml")
           puts "Detected manifest.yml, assuming assets were compiled locally"
           return true
         end

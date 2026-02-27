@@ -99,7 +99,7 @@ class LanguagePack::Base
     release["addons"]                = default_addons
     release["config_vars"]           = default_config_vars
     release["default_process_types"] = default_process_types
-    FileUtils.mkdir("tmp") unless File.exists?("tmp")
+    FileUtils.mkdir("tmp") unless File.exist?("tmp")
     File.open("tmp/heroku-buildpack-release-step.yml", 'w') do |f|
       f.write(release.to_yaml)
     end

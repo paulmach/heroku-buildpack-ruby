@@ -27,7 +27,7 @@ class LanguagePack::JvmInstaller
       key = line.split("=").first
       val = line.split("=").last
       props[key] = val
-    end if File.exists?(SYS_PROPS_FILE)
+    end if File.exist?(SYS_PROPS_FILE)
     props
   end
 

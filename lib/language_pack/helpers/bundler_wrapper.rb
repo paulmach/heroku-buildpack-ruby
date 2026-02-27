@@ -112,7 +112,7 @@ class LanguagePack::Helpers::BundlerWrapper
   private
   def fetch_bundler
     instrument 'fetch_bundler' do
-      return true if Dir.exists?(bundler_path)
+      return true if Dir.exist?(bundler_path)
       FileUtils.mkdir_p(bundler_path)
       Dir.chdir(bundler_path) do
         @fetcher.fetch_untar(@bundler_tar)

@@ -525,7 +525,7 @@ ERROR
   # users should be using `bundle pack` instead.
   # https://github.com/heroku/heroku-buildpack-ruby/issues/21
   def remove_vendor_bundle
-    if File.exists?("vendor/bundle")
+    if File.exist?("vendor/bundle")
       warn(<<-WARNING)
 Removing `vendor/bundle`.
 Checking in `vendor/bundle` is not supported. Please remove this directory
@@ -545,9 +545,10 @@ WARNING
     instrument 'ruby.build_bundler' do
       log("bundle") do
         bundle_without = env("BUNDLE_WITHOUT") || "development:test"
-        bundle_bin     = "bundle config --global ssl_verify_mode 0 && bundle"
-        bundle_command = "#{bundle_bin} install --without #{bundle_without} --path vendor/bundle --binstubs #{bundler_binstubs_path}"
-        bundle_command << " -j4"
+        bundle_bin     = "bundle config set --global ssl_verify_mode 0 && "
+        bundle_bin     << "bundle config set path 'vendor/bundle' && "
+        bundle_bin     << "bundle config set without #{bundle_without} && bundle"
+        bundle_command = "#{bundle_bin} install -j4 && bundle binstubs --all"
 
         if File.exist?("#{Dir.pwd}/.bundle/config")
           warn(<<-WARNING, inline: true)
@@ -572,8 +573,12 @@ WARNING
           log("bundle", "has_windows_gemfile_lock")
           File.unlink("Gemfile.lock")
         else
-          # using --deployment is preferred if we can
-          bundle_command += " --deployment"
+          # The `--deployment` flag has been removed because it relied on being remembered across bundler invocations,
+          # which bundler no longer does. Instead please use `bundle config set deployment true`, and stop using this flag
+          # bundle_command = "bundle config set deployment true && #{bundle_command}"
+          #
+          # We also removed `--frozen` because we were unable to bundle install wiht it
+          # We are now manually check for gemfile modifications after the build.
         end
 
         topic("Installing dependencies using bundler #{bundler.version}")
@@ -797,7 +802,7 @@ params = CGI.parse(uri.query || "")
       @node_preinstall_bin_path = false
     end
     # on alma container, `which` binary is present and it will find `node`
-    # from `/usr/local/bin/node` as a result of which node is considered 
+    # from `/usr/local/bin/node` as a result of which node is considered
     # `preinstalled` and the real node is not installed in the right place.
     # lets ignore this path in this branch.
     # HACK ALERT
@@ -887,7 +892,7 @@ WARNING
       end
 
       # fix bug from v37 deploy
-      if File.exists?("vendor/ruby_version")
+      if File.exist?("vendor/ruby_version")
         puts "Broken cache detected. Purging build cache."
         cache.clear("vendor")
         FileUtils.rm_rf("vendor/ruby_version")
@@ -904,7 +909,7 @@ WARNING
       end
 
       # fix git gemspec bug from Bundler 1.3.0+ upgrade
-      if File.exists?(bundler_cache) && !@metadata.exists?(bundler_version_cache) && !run("find vendor/bundle/*/*/bundler/gems/*/ -name *.gemspec").include?("No such file or directory")
+      if File.exist?(bundler_cache) && !@metadata.exists?(bundler_version_cache) && !run("find vendor/bundle/*/*/bundler/gems/*/ -name *.gemspec").include?("No such file or directory")
         puts "Old bundler cache detected. Clearing bundler cache."
         purge_bundler_cache
       end

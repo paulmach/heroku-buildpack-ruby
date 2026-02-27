@@ -67,6 +67,6 @@ class LanguagePack::Cache
   # @param [String] relative path of the cache contents
   # @param [Boolean] true if the path exists in the cache and false if otherwise
   def exists?(path)
-    File.exists?(@cache_base + path)
+    File.exist?(@cache_base + path)
   end
 end
